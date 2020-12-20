@@ -4,15 +4,7 @@
 <div>
     <h2>Table</h2>
     <div cdkDropListGroup>
-    <div
-      cdkDropList
-      #tableList="cdkDropList"
-      cdkDropListOrientation="horizontal"
-      [cdkDropListData]="tableFigures"
-      [cdkDropListConnectedTo]="[stackList]"
-      (cdkDropListDropped)="drop($event)">
-      <div *ngFor="let item of tableFigures" cdkDrag>{{item}}</div>
-    </div>
+    <app-figure-serie *ngFor="let item of tableFigures" cdkDrag [figures]="item"></app-figure-serie>
 
   
   <div>

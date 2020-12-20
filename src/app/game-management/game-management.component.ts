@@ -3,6 +3,7 @@ import {MatSnackBar,MatSnackBarConfig} from '@angular/material/snack-bar';
 import {CdkDragDrop, moveItemInArray, transferArrayItem, DragDropModule} from '@angular/cdk/drag-drop';
 import {Figure} from './../figure'
 import {RKColor} from '../rkcolor'
+import { FigureComponent } from '../figure/figure.component';
 
 @Component({
   selector: 'app-game-management',
@@ -23,7 +24,6 @@ export class GameManagementComponent implements OnInit {
   }
 
   registerGame(gameId: String): void {
-      // a service would be called
 
       this.snackBar.open("Game successfully registered",null,this.sbConfig);
       this.message="Running Game AABBCC, Round 15";
@@ -33,7 +33,11 @@ export class GameManagementComponent implements OnInit {
   newGame() : void {
 
     this.snackBar.open("New Game Initialized",null,this.sbConfig);
+    this.stackFigures=[];
     this.stackFigures.push(new Figure(new RKColor(0),0,12),new Figure(new RKColor(1),0,3));
+    this.tableFigures=[];
+    this.tableFigures.push([new Figure(new RKColor(0),0,3), new Figure(new RKColor(0),0,4),new Figure(new RKColor(0),0,5), new Figure(new RKColor(0),0,6)]);
+    this.tableFigures.push([new Figure(new RKColor(1),0,9), new Figure(new RKColor(1),0,10),new Figure(new RKColor(1),0,11), new Figure(new RKColor(0),0,12)]);
     this.message="Running Game AABBCC, Round 0";
 
   }
@@ -47,6 +51,10 @@ export class GameManagementComponent implements OnInit {
                         event.previousIndex,
                         event.currentIndex);
     }
+  }
+
+  dropInSeries(event: CdkDragDrop<FigureComponent>) {
+    event.co
   }
 
 }

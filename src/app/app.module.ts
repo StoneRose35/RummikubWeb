@@ -8,12 +8,14 @@ import {MatSnackBar, MatSnackBarConfig} from '@angular/material/snack-bar';
 import { Overlay } from '@angular/cdk/overlay';
 import {DragDropModule} from '@angular/cdk/drag-drop';
 import { FigureComponent } from './figure/figure.component';
+import { FigureSerieComponent } from './figure-serie/figure-serie.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     GameManagementComponent,
-    FigureComponent
+    FigureComponent,
+    FigureSerieComponent
   ],
   imports: [
     BrowserModule,
