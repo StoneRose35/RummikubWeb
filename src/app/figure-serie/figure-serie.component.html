@@ -1,0 +1,14 @@
+
+
+<div
+cdkDropList
+#tableList="cdkDropList"
+cdkDropListOrientation="horizontal"
+[cdkDropListData]="figures"
+[cdkDropListConnectedTo]="[stackList]"
+(cdkDropListDropped)="drop($event)">
+    <app-figure *ngFor="let item of figures" [figure]="item"></app-figure>
+    <div class="RkFigure">
+        <h3 class="RkFigureNumber">+</h3>
+    </div>
+</div>
