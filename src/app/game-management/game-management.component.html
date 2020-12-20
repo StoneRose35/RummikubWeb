@@ -1,0 +1,36 @@
+<div><p>Join Game</p><input #gameId (keyup.enter)="registerGame(gameId.value)"></div>
+<div><button (click)="newGame()">New Game</button></div>
+
+<div>
+    <h2>Table</h2>
+    <div cdkDropListGroup>
+    <div
+      cdkDropList
+      #tableList="cdkDropList"
+      cdkDropListOrientation="horizontal"
+      [cdkDropListData]="tableFigures"
+      [cdkDropListConnectedTo]="[stackList]"
+      (cdkDropListDropped)="drop($event)">
+      <div *ngFor="let item of tableFigures" cdkDrag>{{item}}</div>
+    </div>
+
+  
+  <div>
+    <h2>Stack</h2>
+  
+    <div
+      cdkDropList
+      #stackList="cdkDropList"
+      cdkDropListOrientation="horizontal"
+      [cdkDropListData]="stackFigures"
+      [cdkDropListConnectedTo]="[tableList]"
+      (cdkDropListDropped)="drop($event)">
+      <app-figure *ngFor="let item of stackFigures" cdkDrag [figure]="item"></app-figure>
+    </div>
+  </div>
+</div>
+</div>
+  
+
+
+<div class="bottomStatusBar">{{message}}</div>
