@@ -54,7 +54,7 @@ export class GameManagementComponent implements OnInit {
   }
 
   dropInSeries(event: CdkDragDrop<FigureComponent>) {
-    event.co
+  
   }
 
 }
