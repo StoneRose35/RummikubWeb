@@ -1,12 +1,20 @@
-<div><p>Join Game</p><input #gameId (keyup.enter)="registerGame(gameId.value)"></div>
-<div><button (click)="newGame()">New Game</button></div>
+<div class="rk-container"><div class="rk-top-element">Join Game</div><input #gameId class="rk-top-element" (keyup.enter)="registerGame(gameId.value)">
+<button (click)="newGame()" class="rk-top-element" >{{gameState}}</button></div>
 
-
+<h2>Players</h2>
+<div class="rk-container"><p *ngFor="let p of players" class="rk-player" [ngClass]="{'rk-player-active': p === activePlayer}">{{p}} </p></div>
+<div [hidden]="!playing" class="rk-container"><button class="rk-top-element" (click)="drawFigure()">Draw Figure</button><button class="rk-top-element" (click)="submitMove()">Submit Move</button><button class="rk-top-element" (click)="resetMove()" >Reset Move</button></div>
     
 <div cdkDropListGroup>
   <h2>Table</h2>
-    <app-figure-serie *ngFor="let item of tableFigures" cdkDrag [figures]="item"></app-figure-serie>
-
+    <app-figure-serie *ngFor="let item of tableFigures" [figures]="item"></app-figure-serie>
+    <div class="rk-figure"
+      cdkDropList
+      cdkDropListOrientation="horizontal"
+      (cdkDropListDropped)="dropNewSeries($event)"
+    >
+      <h3 class="rk-figure-number">+</h3>
+    </div>
 
   
   <h2>Stack</h2>

@@ -65,11 +65,37 @@ h1 {
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
+.rk-player {
+  background-color: #eaeaea;
+  border: solid;
+  border-radius: 3px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  border-width: 1px;
+  font-weight: bold;
+  display: inline-flex;
+}
 
+.rk-player-active {
+  background-color: #00c03a;
+}
+
+
+.rk-top-element {
+  margin-left: 10px;
+  margin-right: 10px;
+  display:inline-block;
+}
+
+.rk-container {
+  margin: 15px;
+}
 
 .rk-figure {
-  width: 100px;
-  height: 160px;
+  width: 50px;
+  height: 80px;
   border-radius: 10px;
   border: solid;
   border-color: black;
@@ -97,10 +123,10 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 }
 
 h3.rk-figure-number {
-  padding-top: 34px;
+  padding-top: 17px;
   width: 20%;
   margin: auto;
-  font-size: 34px;
+  font-size: 17px;
 }
 
 .cdk-drag-preview {
@@ -118,3 +144,4 @@ h3.rk-figure-number {
 .cdk-drag-animating {
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
+

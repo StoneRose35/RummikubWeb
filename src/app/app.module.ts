@@ -9,20 +9,29 @@ import { Overlay } from '@angular/cdk/overlay';
 import {DragDropModule} from '@angular/cdk/drag-drop';
 import { FigureComponent } from './figure/figure.component';
 import { FigureSerieComponent } from './figure-serie/figure-serie.component';
+import { MatDialogModule} from '@angular/material/dialog';
+import { FormsModule } from '@angular/forms';
+import { NewPlayerDialogComponent } from './new-player-dialog/new-player-dialog.component';
+import {MatFormFieldModule} from '@angular/material/form-field';
 
 @NgModule({
   declarations: [
     AppComponent,
     GameManagementComponent,
     FigureComponent,
-    FigureSerieComponent
+    FigureSerieComponent,
+    NewPlayerDialogComponent
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
-    DragDropModule
+    DragDropModule,
+    FormsModule,
+    MatDialogModule,
+    MatFormFieldModule
   ],
   providers: [MatSnackBar, Overlay, MatSnackBarConfig],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  entryComponents: [NewPlayerDialogComponent]
 })
 export class AppModule { }
