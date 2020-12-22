@@ -4,6 +4,7 @@
 cdkDropList
 cdkDropListOrientation="horizontal"
 [cdkDropListData]="figures"
+[cdkDropListDisabled]="disabled"
 class="rk-series"
 (cdkDropListDropped)="drop($event)">
     <app-figure *ngFor="let item of figures" cdkDrag [figure]="item"></app-figure>

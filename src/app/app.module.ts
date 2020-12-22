@@ -13,6 +13,7 @@ import { MatDialogModule} from '@angular/material/dialog';
 import { FormsModule } from '@angular/forms';
 import { NewPlayerDialogComponent } from './new-player-dialog/new-player-dialog.component';
 import {MatFormFieldModule} from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 
 @NgModule({
   declarations: [
@@ -28,7 +29,8 @@ import {MatFormFieldModule} from '@angular/material/form-field';
     DragDropModule,
     FormsModule,
     MatDialogModule,
-    MatFormFieldModule
+    MatFormFieldModule,
+    MatInputModule
   ],
   providers: [MatSnackBar, Overlay, MatSnackBarConfig],
   bootstrap: [AppComponent],

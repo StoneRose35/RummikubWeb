@@ -74,6 +74,8 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   padding-top: 6px;
   padding-bottom: 6px;
   border-width: 1px;
+  margin-left: 5px;
+  margin-right: 5px;
   font-weight: bold;
   display: inline-flex;
 }
@@ -127,6 +129,10 @@ h3.rk-figure-number {
   width: 20%;
   margin: auto;
   font-size: 17px;
+}
+
+.rk-inactive {
+  background-color: rgb(192, 192, 192);
 }
 
 .cdk-drag-preview {

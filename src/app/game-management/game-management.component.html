@@ -2,14 +2,15 @@
 <button (click)="newGame()" class="rk-top-element" >{{gameState}}</button></div>
 
 <h2>Players</h2>
-<div class="rk-container"><p *ngFor="let p of players" class="rk-player" [ngClass]="{'rk-player-active': p === activePlayer}">{{p}} </p></div>
+<div class="rk-container"><div *ngFor="let p of players" class="rk-player" [ngClass]="{'rk-player-active': p.active === true}">{{p.name}} </div></div>
 <div [hidden]="!playing" class="rk-container"><button class="rk-top-element" (click)="drawFigure()">Draw Figure</button><button class="rk-top-element" (click)="submitMove()">Submit Move</button><button class="rk-top-element" (click)="resetMove()" >Reset Move</button></div>
     
-<div cdkDropListGroup>
+<div cdkDropListGroup [ngClass]="{'rk-inactive': playing === false}">
   <h2>Table</h2>
-    <app-figure-serie *ngFor="let item of tableFigures" [figures]="item"></app-figure-serie>
+    <app-figure-serie *ngFor="let item of tableFigures" [figures]="item" [disabled]="!playing"></app-figure-serie>
     <div class="rk-figure"
       cdkDropList
+      [cdkDropListDisabled]="!playing"
       cdkDropListOrientation="horizontal"
       (cdkDropListDropped)="dropNewSeries($event)"
     >
@@ -24,6 +25,7 @@
       cdkDropListOrientation="horizontal"
       [cdkDropListData]="stackFigures"
       class="rk-series"
+      [ngClass]="{'rk-inactive': playing === false}"
       (cdkDropListDropped)="drop($event)">
       <app-figure *ngFor="let item of stackFigures" cdkDrag [figure]="item"></app-figure>
     </div>

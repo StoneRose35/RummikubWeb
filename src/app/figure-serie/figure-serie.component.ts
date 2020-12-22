@@ -12,6 +12,9 @@ export class FigureSerieComponent implements OnInit {
   @Input()
   figures: Array<Figure>;
 
+  @Input()
+  disabled: Boolean;
+
   constructor() { 
     this.figures=[];
   }
