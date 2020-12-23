@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, timer } from 'rxjs';
+import { Observable, of, timer, Subject } from 'rxjs';
 import {map,takeUntil} from 'rxjs/operators';
 import {Figure} from './figure';
+import { RKColor } from './rkcolor';
+
 
 export interface Game {
   message: String;
@@ -10,7 +12,6 @@ export interface Game {
 }
 
 export interface GameState {
-  player: Player;
   tableFigures: Array<Array<Figure>>;
   stackFigures: Array<Figure>;
   accepted: boolean;
@@ -32,7 +33,13 @@ export interface Response {
 export class GameService {
 
   p: Player;
-  constructor() { }
+  gameId: String;
+  activityChangedSubject: Subject<boolean>;
+
+  constructor() { 
+    this.activityChangedSubject=new Subject<boolean>();
+  }
+
 
   public startGame(gameId: String): Observable<Game>
   {
@@ -40,12 +47,7 @@ export class GameService {
     return of(data);
   }
 
-  public pollTableFigures(): Observable<Array<Figure>> 
-  {
-    return of(null);
-  }
-
-  public registerPlayer(playerName: String, gameId: String): Observable<Response>
+  public registerPlayer(playerName: String): Observable<Response>
   {
     this.p = {name: playerName, active: true};
     return of({message: "Player registered successfully", error: null});
@@ -53,12 +55,14 @@ export class GameService {
 
   public initGame(): Observable<String> 
   {
+    this.gameId = "AABBCC";
     return of("AABBCC");
   }
 
-  public pollPlayers(gameId: String): Observable<Array<Player>> 
+  public pollPlayers(): Observable<Array<Player>> 
   {
-    if (gameId=="")
+    const act_old = this.p.active;
+    if (this.gameId=="")
     {
       let data = [{name: "void", active: false}];
       return timer(1,2000).pipe(map(t => data));
@@ -66,19 +70,47 @@ export class GameService {
     else
     {
       let data = [this.p, {name: "Finni", active: false}];
-      return timer(1,2000).pipe(map(t => {
+      return timer(1,5000).pipe(map(t => {
         this.p.active=t%2==0;
+        data[1].active=t%2==1;
+        if (this.p.active != act_old)
+        {
+          this.activityChangedSubject.next(this.p.active);
+        }
         return data;
       }));
     }
-    
-    
+
+
+  }
+
+  activityChanged(): Observable<boolean> {
+    return this.activityChangedSubject;
+  }
+
+  pollTable(): Observable<Array<Array<Figure>>>{
+    const data: Array<Array<Figure>> =[[{color: new RKColor(3),instance:0, value:12}]]; 
+    return of(data);
+  }
+
+  public connectToGame(gameId: String): Observable<Response>
+  {
+    this.gameId=gameId;
+    const resp={message: "Successfully attached game", error: null};
+    return of(resp);
+  }
+
+  public drawFigure(): Observable<Figure>
+  {
+    const f = new Figure(new RKColor(1),0,4);
+    this.p.active=false;
+    return of(f);
   }
 
   public submitMove(stateOld: GameState): Observable<GameState>
   {
     stateOld.accepted = false;
-    stateOld.player.active = false;
+    this.p.active = false;
     return of(stateOld);
   }
 

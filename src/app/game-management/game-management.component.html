@@ -24,6 +24,7 @@
       #stackList="cdkDropList"
       cdkDropListOrientation="horizontal"
       [cdkDropListData]="stackFigures"
+      [cdkDropListDisabled]="!playing"
       class="rk-series"
       [ngClass]="{'rk-inactive': playing === false}"
       (cdkDropListDropped)="drop($event)">

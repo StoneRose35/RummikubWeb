@@ -5,7 +5,8 @@ import {Figure} from './../figure'
 import {RKColor} from '../rkcolor'
 import {MatDialog} from '@angular/material/dialog';
 import { NewPlayerDialogComponent } from '../new-player-dialog/new-player-dialog.component';
-import { GameService, Player } from './../game.service'
+import { GameService, GameState, Player } from './../game.service'
+import { Observable,of, Subject } from 'rxjs';
 
 @Component({
   selector: 'app-game-management',
@@ -18,30 +19,74 @@ export class GameManagementComponent implements OnInit {
   stackFigures: Array<Figure>;
   players: Array<Player>;
   message: String;
-  activeGame: String;
   playing: Boolean;
   gameState: String;
   activePlayer: Player;
   stackFiguresOld: Array<Figure>;
   tableFiguresOld: Array<Array<Figure>>;
   playerPollSubscription: any;
+  tablePollSubscription: any;
   constructor(private snackBar: MatSnackBar,private sbConfig: MatSnackBarConfig,private dialog: MatDialog,public gs: GameService) { 
     this.sbConfig.duration=2000;
     this.stackFigures = [];
-    this.activeGame = "";
     this.players=[];
     this.gameState = "New Game";
   }
 
   ngOnInit(): void {
+    this.gs.activityChanged().subscribe(val => {
+      if (val == true)
+      {
+        if (this.tablePollSubscription != null)
+        {
+          this.tablePollSubscription.unsubscribe();
+        }
+      }
+      else
+      {
+        if (this.gs.p != null && this.gs.gameId != null)
+        {
+          this.tablePollSubscription=this.gs.pollTable().subscribe(t => this.tableFigures);
+        }
+      }
+    });
+
   }
 
   registerGame(gameId: String): void {
-
-      this.snackBar.open("Game successfully registered",null,this.sbConfig);
-      this.activeGame=gameId;
-      this.message="Running Game " + this.activeGame + ", Round 15";
-
+    this.gs.connectToGame(gameId).subscribe(resp => {
+      if (resp.error != null)
+      {
+        this.snackBar.open(`failed to register with game: ${resp.error}`);
+        this.message = "";
+      }
+      else
+      {
+        const dialogRef = this.dialog.open(NewPlayerDialogComponent);
+        this.players=[];
+        dialogRef.afterClosed().subscribe(playerName => {
+          this.gs.registerPlayer(playerName).subscribe(reg_resp => {
+            if (reg_resp.error == null)
+            {
+              this.activePlayer = this.gs.p;
+              this.gameState="Start Game";
+              this.snackBar.open(`Game ${gameId} Joined`,null,this.sbConfig);
+              this.message=`Running Game ${gameId}`;
+              this.stackFigures=[];
+              this.tableFigures=[];
+              if (this.playerPollSubscription != null)
+              {
+                 this.playerPollSubscription.unsubscribe();
+              }
+              this.playerPollSubscription = this.gs.pollPlayers().subscribe(ps => {
+                this.players=ps;
+                this.playing = this.gs.p.active;
+              });
+            }
+          }); 
+      });
+      }
+    });
   }
 
   newGame() : void {
@@ -52,16 +97,11 @@ export class GameManagementComponent implements OnInit {
         const dialogRef = this.dialog.open(NewPlayerDialogComponent);
         this.players=[];
         dialogRef.afterClosed().subscribe(playerName => {
-          this.gs.registerPlayer(playerName,res).subscribe(resp => {
+          this.gs.registerPlayer(playerName).subscribe(resp => {
             if (resp.error == null)
             {
-              let player = {name: playerName, active: false};
-              this.players.push(player);
-              this.activePlayer = player;
-    
+              this.activePlayer = this.gs.p;
               this.gameState="Start Game";
-              this.activeGame = res;
-              this.playing = false;
               this.snackBar.open(`New Game ${res} Initialized`,null,this.sbConfig);
               this.message=`Running Game ${res}`;
               this.stackFigures=[];
@@ -70,17 +110,9 @@ export class GameManagementComponent implements OnInit {
               {
                  this.playerPollSubscription.unsubscribe();
               }
-              this.playerPollSubscription = this.gs.pollPlayers(this.activeGame).subscribe(ps => {
+              this.playerPollSubscription = this.gs.pollPlayers().subscribe(ps => {
                 this.players=ps;
-                let isplaying=false;
-                for (let p of this.players)
-                {
-                  if (p.active==true && p.name==this.activePlayer.name)
-                  {
-                    isplaying=true;
-                  }
-                }
-                this.playing=isplaying;
+                this.playing = this.gs.p.active;
               });
           }
           }); 
@@ -99,11 +131,23 @@ export class GameManagementComponent implements OnInit {
   }
 
   drawFigure() {
-
+    this.gs.drawFigure().subscribe(fig => this.stackFigures.push(fig));
   }
 
   submitMove() {
-
+    const gameState={tableFigures: this.tableFigures, stackFigures: this.stackFigures, accepted: null };
+    this.gs.submitMove(gameState).subscribe(r => {
+      if (r.accepted == false) // game state submitted is invalid
+      {
+        this.snackBar.open("Invalid Move, resetting");
+        this.resetMove();
+      }
+      else 
+      {
+        this.stackFigures = r.stackFigures;
+        this.tableFigures = r.tableFigures;
+      }
+    });
   }
 
   resetMove() {
@@ -150,7 +194,6 @@ export class GameManagementComponent implements OnInit {
   }
 
   dropNewSeries(event: CdkDragDrop<Figure[]>) {
-    let droppedFigure = event.previousContainer.data[event.previousIndex]
     this.tableFigures.push([]);
     transferArrayItem(event.previousContainer.data,
                       this.tableFigures[this.tableFigures.length-1],
