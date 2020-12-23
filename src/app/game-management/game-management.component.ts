@@ -34,10 +34,6 @@ export class GameManagementComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    /*
-    this.playerPollSubscription = this.gs.pollPlayers("").subscribe(ps => {
-      this.players=ps;
-    });*/
   }
 
   registerGame(gameId: String): void {

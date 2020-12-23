@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Figure } from './../figure';
-import {CdkDragDrop, moveItemInArray, transferArrayItem, DragDropModule} from '@angular/cdk/drag-drop';
+import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-figure-serie',
