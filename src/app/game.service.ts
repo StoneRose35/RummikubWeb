@@ -1,14 +1,21 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, timer, Subject } from 'rxjs';
-import {map,takeUntil} from 'rxjs/operators';
+import {map,switchMap,takeUntil} from 'rxjs/operators';
 import {Figure} from './figure';
 import { RKColor } from './rkcolor';
+import { HttpClient,HttpParams } from '@angular/common/http';
+import { CookieService } from 'ngx-cookie-service';  
 
 
 export interface Game {
   message: String;
   tableFigures: Array<Array<Figure>>;
   error: String; 
+}
+
+export interface GameOverview {
+  players: Array<String>;
+  name: String;
 }
 
 export interface GameState {
@@ -37,8 +44,14 @@ export class GameService {
   gameId: String;
   activityChangedSubject: Subject<boolean>;
 
-  constructor() { 
+  constructor(private http: HttpClient) { 
     this.activityChangedSubject=new Subject<boolean>();
+    this.p = {name: null, active: false};
+  }
+
+  public getGames(): Observable<Array<GameOverview>>
+  {
+      return this.http.get<Array<GameOverview>>("http://localhost:8080/games");
   }
 
 
@@ -48,26 +61,28 @@ export class GameService {
     return of(data);
   }
 
-  public registerPlayer(playerName: String): Observable<Response>
+  public registerPlayer(playerName: String, gameName: String): Observable<Response>
   {
-    this.p = {name: playerName, active: true};
-    return of({message: "Player registered successfully", error: null});
+    this.p.name=playerName;
+    return this.http.get<Response>("http://localhost:8080/registerPlayer",{params: {name: playerName.toString(),gameId: gameName.toString() },withCredentials: true});
   }
 
   public shelfFigures(): Observable<Array<Figure>>
   {
-    return of([{color: {name: "red", rgb: [255,0,0], code: 0}, instance: 0, number: 12}]);
+    return this.http.get<Array<Figure>>("http://localhost:8080/shelfFigures",{withCredentials: true});
   }
 
-  public initGame(name: String): Observable<Response> 
+  public initGame(gameName: String): Observable<Response> 
   {
-    this.gameId = "AABBCC";
-    return of({message: "Game " + name + " successfully created", error: null});
+    this.gameId = gameName;
+    return this.http.get<Response>("http://localhost:8080/newgame",{params: {name: gameName.toString()}});
   }
 
   public pollPlayers(): Observable<Array<Player>> 
   {
     const act_old = this.p.active;
+    //return timer(1,200).pipe(switchMap(() => this.http.get<Array<Player>>("http://localhost:8080/players",{withCredentials: true})));
+    
     if (this.gameId=="")
     {
       let data = [{name: "void", active: false}];
@@ -86,8 +101,6 @@ export class GameService {
         return data;
       }));
     }
-
-
   }
 
   activityChanged(): Observable<boolean> {

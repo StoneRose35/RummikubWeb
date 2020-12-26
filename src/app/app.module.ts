@@ -14,6 +14,9 @@ import { FormsModule } from '@angular/forms';
 import { NewPlayerDialogComponent } from './new-player-dialog/new-player-dialog.component';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { GamesOverviewComponent } from './games-overview/games-overview.component';
+import { RoutingModule } from './routing/routing.module';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -21,7 +24,8 @@ import { MatInputModule } from '@angular/material/input';
     GameManagementComponent,
     FigureComponent,
     FigureSerieComponent,
-    NewPlayerDialogComponent
+    NewPlayerDialogComponent,
+    GamesOverviewComponent
   ],
   imports: [
     BrowserModule,
@@ -30,7 +34,9 @@ import { MatInputModule } from '@angular/material/input';
     FormsModule,
     MatDialogModule,
     MatFormFieldModule,
-    MatInputModule
+    MatInputModule,
+    RoutingModule,
+    HttpClientModule
   ],
   providers: [MatSnackBar, Overlay, MatSnackBarConfig],
   bootstrap: [AppComponent],

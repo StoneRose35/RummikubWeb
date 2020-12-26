@@ -1,0 +1,7 @@
+<ul>
+    <li *ngFor="let g of games"><div >{{g.name}}</div>
+        <div><p *ngFor="let pl of g.players">{{pl}}</p></div>
+        <button (click)="joinGame(g.name)">Join</button>
+    </li>
+</ul>
+<input #newGameName (keyup.enter)="registerGame(newGameName.value)">

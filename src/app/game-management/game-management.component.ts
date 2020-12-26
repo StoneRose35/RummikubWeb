@@ -5,7 +5,8 @@ import {Figure} from './../figure'
 import {RKColor} from '../rkcolor'
 import {MatDialog} from '@angular/material/dialog';
 import { NewPlayerDialogComponent } from '../new-player-dialog/new-player-dialog.component';
-import { GameService, Player } from './../game.service'
+import { GameService, Player } from './../game.service';
+import { CookieService } from 'ngx-cookie-service'; 
 
 @Component({
   selector: 'app-game-management',
@@ -25,7 +26,13 @@ export class GameManagementComponent implements OnInit {
   tableFiguresOld: Array<Array<Figure>>;
   playerPollSubscription: any;
   tablePollSubscription: any;
-  constructor(private snackBar: MatSnackBar,private sbConfig: MatSnackBarConfig,private dialog: MatDialog,public gs: GameService) { 
+ 
+
+  constructor(private snackBar: MatSnackBar
+              ,private sbConfig: MatSnackBarConfig
+              ,private dialog: MatDialog
+              ,public gs: GameService
+              ) { 
     this.sbConfig.duration=2000;
     this.stackFigures = [];
     this.players=[];
@@ -33,6 +40,18 @@ export class GameManagementComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
+    this.activePlayer = this.gs.p;
+    this.gameState="Start Game";
+    this.snackBar.open(`New Game ${this.gs.gameId} Initialized`,null,this.sbConfig);
+    this.message=`Running Game ${this.gs.gameId}`;
+    this.gs.shelfFigures().subscribe(f => this.stackFigures=f);
+    this.tableFigures=[];
+    this.playerPollSubscription = this.gs.pollPlayers().subscribe(ps => {
+      this.players=ps;
+      this.playing = this.gs.p.active;
+    });
+
     this.gs.activityChanged().subscribe(val => {
       if (val == true)
       {
@@ -63,6 +82,7 @@ export class GameManagementComponent implements OnInit {
       {
         const dialogRef = this.dialog.open(NewPlayerDialogComponent);
         this.players=[];
+        /*
         dialogRef.afterClosed().subscribe(playerName => {
           this.gs.registerPlayer(playerName).subscribe(reg_resp => {
             if (reg_resp.error == null)
@@ -85,7 +105,7 @@ export class GameManagementComponent implements OnInit {
               });
             }
           }); 
-      });
+      });*/
       }
     });
   }
@@ -97,6 +117,7 @@ export class GameManagementComponent implements OnInit {
 
         const dialogRef = this.dialog.open(NewPlayerDialogComponent);
         this.players=[];
+        /*
         dialogRef.afterClosed().subscribe(playerName => {
           this.gs.registerPlayer(playerName).subscribe(resp => {
             if (resp.error == null)
@@ -120,7 +141,7 @@ export class GameManagementComponent implements OnInit {
           }
           }); 
 
-        });
+        });*/
       });
     }
     else

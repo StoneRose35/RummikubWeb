@@ -1,4 +1,9 @@
-<div>
+<div class="mainElement">
 <h1>Rummikub Web</h1>
-<app-game-management></app-game-management>
+<nav>
+<a routerLink="/overview" routerLinkActive="active">Overview</a>
+<a routerLink="/game-management" routerLinkActive="active">Game Management</a>
+  </nav>
+
+<router-outlet></router-outlet>
 </div>
