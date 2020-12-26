@@ -93,7 +93,7 @@ export class GameManagementComponent implements OnInit {
   newGame() : void {
     if (this.gameState=="New Game")
     {
-      this.gs.initGame().subscribe(res => {
+      this.gs.initGame("TheBestGame").subscribe(res => {
 
         const dialogRef = this.dialog.open(NewPlayerDialogComponent);
         this.players=[];

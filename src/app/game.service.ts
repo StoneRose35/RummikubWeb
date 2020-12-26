@@ -16,8 +16,6 @@ export interface GameState {
   stackFigures: Array<Figure>;
   roundNr: number;
   accepted: boolean;
-  gameId: String;
-  player: Player;
 }
 
 export interface Player {
