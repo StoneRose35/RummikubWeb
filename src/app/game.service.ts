@@ -14,7 +14,10 @@ export interface Game {
 export interface GameState {
   tableFigures: Array<Array<Figure>>;
   stackFigures: Array<Figure>;
+  roundNr: number;
   accepted: boolean;
+  gameId: String;
+  player: Player;
 }
 
 export interface Player {
@@ -43,7 +46,7 @@ export class GameService {
 
   public startGame(gameId: String): Observable<Game>
   {
-    let data = {message: "Game Started", tableFigures: [[{color: {name: "red", rgb: [255,0,0], code: 0}, instance: 0, value: 12}]], error: ""}
+    let data = {message: "Game Started", tableFigures: [[{color: {name: "red", rgb: [255,0,0], code: 0}, instance: 0, number: 12}]], error: ""}
     return of(data);
   }
 
@@ -53,10 +56,15 @@ export class GameService {
     return of({message: "Player registered successfully", error: null});
   }
 
-  public initGame(): Observable<String> 
+  public shelfFigures(): Observable<Array<Figure>>
+  {
+    return of([{color: {name: "red", rgb: [255,0,0], code: 0}, instance: 0, number: 12}]);
+  }
+
+  public initGame(name: String): Observable<Response> 
   {
     this.gameId = "AABBCC";
-    return of("AABBCC");
+    return of({message: "Game " + name + " successfully created", error: null});
   }
 
   public pollPlayers(): Observable<Array<Player>> 
@@ -89,7 +97,7 @@ export class GameService {
   }
 
   pollTable(): Observable<Array<Array<Figure>>>{
-    const data: Array<Array<Figure>> =[[{color: new RKColor(3),instance:0, value:12}]]; 
+    const data: Array<Array<Figure>> =[[{color: new RKColor(3),instance:0, number:12}]]; 
     return of(data);
   }
 

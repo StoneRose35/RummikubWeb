@@ -5,8 +5,7 @@ import {Figure} from './../figure'
 import {RKColor} from '../rkcolor'
 import {MatDialog} from '@angular/material/dialog';
 import { NewPlayerDialogComponent } from '../new-player-dialog/new-player-dialog.component';
-import { GameService, GameState, Player } from './../game.service'
-import { Observable,of, Subject } from 'rxjs';
+import { GameService, Player } from './../game.service'
 
 @Component({
   selector: 'app-game-management',
@@ -72,7 +71,9 @@ export class GameManagementComponent implements OnInit {
               this.gameState="Start Game";
               this.snackBar.open(`Game ${gameId} Joined`,null,this.sbConfig);
               this.message=`Running Game ${gameId}`;
-              this.stackFigures=[];
+              this.gs.shelfFigures().subscribe(r => {
+                this.stackFigures = r;
+              });
               this.tableFigures=[];
               if (this.playerPollSubscription != null)
               {
@@ -104,7 +105,9 @@ export class GameManagementComponent implements OnInit {
               this.gameState="Start Game";
               this.snackBar.open(`New Game ${res} Initialized`,null,this.sbConfig);
               this.message=`Running Game ${res}`;
-              this.stackFigures=[];
+              this.gs.shelfFigures().subscribe(r => {
+                this.stackFigures = r;
+              });
               this.tableFigures=[];
               if (this.playerPollSubscription != null)
               {
@@ -135,7 +138,7 @@ export class GameManagementComponent implements OnInit {
   }
 
   submitMove() {
-    const gameState={tableFigures: this.tableFigures, stackFigures: this.stackFigures, accepted: null };
+    const gameState={tableFigures: this.tableFigures, stackFigures: this.stackFigures, accepted: null, roundNr: 0 };
     this.gs.submitMove(gameState).subscribe(r => {
       if (r.accepted == false) // game state submitted is invalid
       {
