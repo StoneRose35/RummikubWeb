@@ -45,6 +45,7 @@ export class GamesOverviewComponent implements OnInit {
             }
             else
             {
+                this.gs.p = r.player;
                 this.router.navigateByUrl("/game-management");
             }
           });

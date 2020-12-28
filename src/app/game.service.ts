@@ -11,6 +11,7 @@ export interface Game {
   message: String;
   tableFigures: Array<Array<Figure>>;
   error: String; 
+
 }
 
 export interface GameOverview {
@@ -20,7 +21,7 @@ export interface GameOverview {
 
 export interface GameState {
   tableFigures: Array<Array<Figure>>;
-  stackFigures: Array<Figure>;
+  shelfFigures: Array<Figure>;
   roundNr: number;
   accepted: boolean;
 }
@@ -35,6 +36,12 @@ export interface Response {
   error: String;
 }
 
+export interface ResponsePlayer {
+  message: String;
+  error: String;
+  player: Player;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -43,6 +50,7 @@ export class GameService {
   p: Player;
   gameId: String;
   activityChangedSubject: Subject<boolean>;
+  roundNr: number;
 
   constructor(private http: HttpClient) { 
     this.activityChangedSubject=new Subject<boolean>();
@@ -61,10 +69,9 @@ export class GameService {
     return of(data);
   }
 
-  public registerPlayer(playerName: String, gameName: String): Observable<Response>
+  public registerPlayer(playerName: String, gameName: String): Observable<ResponsePlayer>
   {
-    this.p.name=playerName;
-    return this.http.get<Response>("http://localhost:8080/registerPlayer",{params: {name: playerName.toString(),gameId: gameName.toString() },withCredentials: true});
+    return this.http.get<ResponsePlayer>("http://localhost:8080/registerPlayer",{params: {name: playerName.toString(),gameId: gameName.toString() },withCredentials: true})
   }
 
   public shelfFigures(): Observable<Array<Figure>>
@@ -81,35 +88,20 @@ export class GameService {
   public pollPlayers(): Observable<Array<Player>> 
   {
     const act_old = this.p.active;
-    //return timer(1,200).pipe(switchMap(() => this.http.get<Array<Player>>("http://localhost:8080/players",{withCredentials: true})));
-    
-    if (this.gameId=="")
-    {
-      let data = [{name: "void", active: false}];
-      return timer(1,2000).pipe(map(t => data));
-    }
-    else
-    {
-      let data = [this.p, {name: "Finni", active: false}];
-      return timer(1,5000).pipe(map(t => {
-        this.p.active=t%2==0;
-        data[1].active=t%2==1;
-        if (this.p.active != act_old)
-        {
-          this.activityChangedSubject.next(this.p.active);
-        }
-        return data;
-      }));
-    }
+    return timer(1,5000).pipe(switchMap(() => this.http.get<Array<Player>>("http://localhost:8080/players",{withCredentials: true})));
   }
 
   activityChanged(): Observable<boolean> {
     return this.activityChangedSubject;
   }
 
-  pollTable(): Observable<Array<Array<Figure>>>{
+  pollTable(): Observable<Array<Array<Figure>>>
+  {  
+    return this.http.get<Array<Array<Figure>>>("http://localhost:8080/tableFigures",{withCredentials: true});
+    /*
     const data: Array<Array<Figure>> =[[{color: new RKColor(3),instance:0, number:12}]]; 
     return of(data);
+    */
   }
 
   public connectToGame(gameId: String): Observable<Response>
@@ -121,16 +113,16 @@ export class GameService {
 
   public drawFigure(): Observable<Figure>
   {
-    const f = new Figure(new RKColor(1),0,4);
-    this.p.active=false;
-    return of(f);
+    return this.http.get<Figure>("http://localhost:8080/draw",{withCredentials: true});
   }
 
   public submitMove(stateOld: GameState): Observable<GameState>
   {
-    stateOld.accepted = false;
+    return this.http.post<GameState>("http://localhost:8080/submitMove",stateOld,{withCredentials: true});
+    /*stateOld.accepted = false;
     this.p.active = false;
     return of(stateOld);
+    */
   }
 
 }

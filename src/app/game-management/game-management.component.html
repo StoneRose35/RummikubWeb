@@ -1,5 +1,5 @@
-<div class="rk-container"><div class="rk-top-element">Join Game</div><input #gameId class="rk-top-element" (keyup.enter)="registerGame(gameId.value)">
-<button (click)="newGame()" class="rk-top-element" >{{gameState}}</button></div>
+<div class="rk-container"><div class="rk-top-element">{{gs.gameId}}, round {{gs.roundNr}}</div></div>
+
 
 <h2>Players</h2>
 <div class="rk-container"><div *ngFor="let p of players" class="rk-player" [ngClass]="{'rk-player-active': p.active === true}">{{p.name}} </div></div>

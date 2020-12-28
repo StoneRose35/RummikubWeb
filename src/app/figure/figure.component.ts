@@ -22,7 +22,14 @@ export class FigureComponent implements OnInit {
     }
     else
     {
-      this.repr = "J";
+      if (this.figure.number > 0)
+      {
+        this.repr = "J (" + this.figure.number + ")";
+      }
+      else
+      {
+        this.repr = "J";
+      }
     }
   }
 

@@ -6,7 +6,7 @@ import {RKColor} from '../rkcolor'
 import {MatDialog} from '@angular/material/dialog';
 import { NewPlayerDialogComponent } from '../new-player-dialog/new-player-dialog.component';
 import { GameService, Player } from './../game.service';
-import { CookieService } from 'ngx-cookie-service'; 
+import { JokerProcessor } from './../joker-processor'
 
 @Component({
   selector: 'app-game-management',
@@ -26,6 +26,7 @@ export class GameManagementComponent implements OnInit {
   tableFiguresOld: Array<Array<Figure>>;
   playerPollSubscription: any;
   tablePollSubscription: any;
+  activityChangeSubscription: any;
  
 
   constructor(private snackBar: MatSnackBar
@@ -47,27 +48,34 @@ export class GameManagementComponent implements OnInit {
     this.message=`Running Game ${this.gs.gameId}`;
     this.gs.shelfFigures().subscribe(f => this.stackFigures=f);
     this.tableFigures=[];
-    this.playerPollSubscription = this.gs.pollPlayers().subscribe(ps => {
-      this.players=ps;
-      this.playing = this.gs.p.active;
-    });
+    if (this.playerPollSubscription == null)
+    {
+      this.playerPollSubscription = this.gs.pollPlayers().subscribe(ps => {
+        this.players=ps;
+        this.gs.p.active = ps.filter(p => p.name === this.gs.p.name)[0].active;
+        this.playing = this.gs.p.active;
+      });
+    }
 
-    this.gs.activityChanged().subscribe(val => {
-      if (val == true)
-      {
-        if (this.tablePollSubscription != null)
+    if (this.activityChangeSubscription == null)
+    {
+      this.activityChangeSubscription = this.gs.activityChanged().subscribe(val => {
+        if (val == true)
         {
-          this.tablePollSubscription.unsubscribe();
+          if (this.tablePollSubscription != null)
+          {
+            this.tablePollSubscription.unsubscribe();
+          }
         }
-      }
-      else
-      {
-        if (this.gs.p != null && this.gs.gameId != null)
+        else
         {
-          this.tablePollSubscription=this.gs.pollTable().subscribe(t => this.tableFigures);
+          if (this.gs.p != null && this.gs.gameId != null)
+          {
+            this.tablePollSubscription=this.gs.pollTable().subscribe(t => this.tableFigures);
+          }
         }
-      }
-    });
+      });
+    }
 
   }
 
@@ -159,7 +167,7 @@ export class GameManagementComponent implements OnInit {
   }
 
   submitMove() {
-    const gameState={tableFigures: this.tableFigures, stackFigures: this.stackFigures, accepted: null, roundNr: 0 };
+    const gameState={tableFigures: this.tableFigures, shelfFigures: this.stackFigures, accepted: false, roundNr: 13 };
     this.gs.submitMove(gameState).subscribe(r => {
       if (r.accepted == false) // game state submitted is invalid
       {
@@ -168,7 +176,7 @@ export class GameManagementComponent implements OnInit {
       }
       else 
       {
-        this.stackFigures = r.stackFigures;
+        this.stackFigures = r.shelfFigures;
         this.tableFigures = r.tableFigures;
       }
     });
@@ -206,7 +214,8 @@ export class GameManagementComponent implements OnInit {
 
   }
 
-  drop(event: CdkDragDrop<string[]>) {
+  drop(event: CdkDragDrop<Figure[]>) {
+    let jp = new JokerProcessor();
     if (event.previousContainer === event.container) {
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     } else {
@@ -214,6 +223,7 @@ export class GameManagementComponent implements OnInit {
                         event.container.data,
                         event.previousIndex,
                         event.currentIndex);
+      jp.process(event.container.data);
     }
   }
 
