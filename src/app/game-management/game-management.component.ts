@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import {MatSnackBar,MatSnackBarConfig} from '@angular/material/snack-bar';
 import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
-import {Figure} from './../figure'
-import {RKColor} from '../rkcolor'
+import {Figure} from './../figure';
+import {RKColor} from '../rkcolor';
 import {MatDialog} from '@angular/material/dialog';
 import { NewPlayerDialogComponent } from '../new-player-dialog/new-player-dialog.component';
 import { GameService, Player } from './../game.service';
@@ -46,120 +46,40 @@ export class GameManagementComponent implements OnInit {
     this.gameState="Start Game";
     this.snackBar.open(`New Game ${this.gs.gameId} Initialized`,null,this.sbConfig);
     this.message=`Running Game ${this.gs.gameId}`;
-    this.gs.shelfFigures().subscribe(f => this.stackFigures=f);
+    this.stackFigures = [];
     this.tableFigures=[];
+    this.gs.pollTable().subscribe(t => {
+      this.tableFigures=t;
+      this.gs.shelfFigures().subscribe(f => {
+        this.stackFigures=f;
+        this.onTurn();
+      });
+    });
     if (this.playerPollSubscription == null)
     {
       this.playerPollSubscription = this.gs.pollPlayers().subscribe(ps => {
         this.players=ps;
         this.gs.p.active = ps.filter(p => p.name === this.gs.p.name)[0].active;
-        this.playing = this.gs.p.active;
-      });
-    }
-
-    if (this.activityChangeSubscription == null)
-    {
-      this.activityChangeSubscription = this.gs.activityChanged().subscribe(val => {
-        if (val == true)
+        if (this.playing===true && this.gs.p.active===false)
         {
-          if (this.tablePollSubscription != null)
-          {
-            this.tablePollSubscription.unsubscribe();
-          }
+          // switch from active to inactive
+          this.playing=this.gs.p.active;
+        }
+        else if (this.playing===false && this.gs.p.active===true)
+        {
+          // switch from passive to active
+          this.gs.pollTable().subscribe(t => {
+            this.tableFigures=t; 
+            this.onTurn();
+            this.playing=this.gs.p.active;
+          });
         }
         else
         {
-          if (this.gs.p != null && this.gs.gameId != null)
-          {
-            this.tablePollSubscription=this.gs.pollTable().subscribe(t => this.tableFigures);
-          }
+          this.playing = this.gs.p.active;
         }
       });
     }
-
-  }
-
-  registerGame(gameId: String): void {
-    this.gs.connectToGame(gameId).subscribe(resp => {
-      if (resp.error != null)
-      {
-        this.snackBar.open(`failed to register with game: ${resp.error}`);
-        this.message = "";
-      }
-      else
-      {
-        const dialogRef = this.dialog.open(NewPlayerDialogComponent);
-        this.players=[];
-        /*
-        dialogRef.afterClosed().subscribe(playerName => {
-          this.gs.registerPlayer(playerName).subscribe(reg_resp => {
-            if (reg_resp.error == null)
-            {
-              this.activePlayer = this.gs.p;
-              this.gameState="Start Game";
-              this.snackBar.open(`Game ${gameId} Joined`,null,this.sbConfig);
-              this.message=`Running Game ${gameId}`;
-              this.gs.shelfFigures().subscribe(r => {
-                this.stackFigures = r;
-              });
-              this.tableFigures=[];
-              if (this.playerPollSubscription != null)
-              {
-                 this.playerPollSubscription.unsubscribe();
-              }
-              this.playerPollSubscription = this.gs.pollPlayers().subscribe(ps => {
-                this.players=ps;
-                this.playing = this.gs.p.active;
-              });
-            }
-          }); 
-      });*/
-      }
-    });
-  }
-
-  newGame() : void {
-    if (this.gameState=="New Game")
-    {
-      this.gs.initGame("TheBestGame").subscribe(res => {
-
-        const dialogRef = this.dialog.open(NewPlayerDialogComponent);
-        this.players=[];
-        /*
-        dialogRef.afterClosed().subscribe(playerName => {
-          this.gs.registerPlayer(playerName).subscribe(resp => {
-            if (resp.error == null)
-            {
-              this.activePlayer = this.gs.p;
-              this.gameState="Start Game";
-              this.snackBar.open(`New Game ${res} Initialized`,null,this.sbConfig);
-              this.message=`Running Game ${res}`;
-              this.gs.shelfFigures().subscribe(r => {
-                this.stackFigures = r;
-              });
-              this.tableFigures=[];
-              if (this.playerPollSubscription != null)
-              {
-                 this.playerPollSubscription.unsubscribe();
-              }
-              this.playerPollSubscription = this.gs.pollPlayers().subscribe(ps => {
-                this.players=ps;
-                this.playing = this.gs.p.active;
-              });
-          }
-          }); 
-
-        });*/
-      });
-    }
-    else
-    {
-      this.gameState="New Game";
-      this.stackFigures=[new Figure(new RKColor(0),0,12),new Figure(new RKColor(1),0,3)];
-      this.tableFigures=[];
-      this.onTurn();
-    }
-
   }
 
   drawFigure() {
@@ -171,7 +91,7 @@ export class GameManagementComponent implements OnInit {
     this.gs.submitMove(gameState).subscribe(r => {
       if (r.accepted == false) // game state submitted is invalid
       {
-        this.snackBar.open("Invalid Move, resetting");
+        this.snackBar.open("Invalid Move, resetting",null,this.sbConfig);
         this.resetMove();
       }
       else 
@@ -223,7 +143,7 @@ export class GameManagementComponent implements OnInit {
                         event.container.data,
                         event.previousIndex,
                         event.currentIndex);
-      jp.process(event.container.data);
+      jp.reset(event.container.data);
     }
   }
 

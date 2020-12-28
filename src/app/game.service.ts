@@ -65,7 +65,7 @@ export class GameService {
 
   public startGame(gameId: String): Observable<Game>
   {
-    let data = {message: "Game Started", tableFigures: [[{color: {name: "red", rgb: [255,0,0], code: 0}, instance: 0, number: 12}]], error: ""}
+    let data = {message: "Game Started", tableFigures: [[{color: {name: "red", rgb: "#ff0000", code: 0}, instance: 0, number: 12}]], error: ""}
     return of(data);
   }
 
@@ -88,7 +88,7 @@ export class GameService {
   public pollPlayers(): Observable<Array<Player>> 
   {
     const act_old = this.p.active;
-    return timer(1,5000).pipe(switchMap(() => this.http.get<Array<Player>>("http://localhost:8080/players",{withCredentials: true})));
+    return timer(1,500).pipe(switchMap(() => this.http.get<Array<Player>>("http://localhost:8080/players",{withCredentials: true})));
   }
 
   activityChanged(): Observable<boolean> {
@@ -98,10 +98,6 @@ export class GameService {
   pollTable(): Observable<Array<Array<Figure>>>
   {  
     return this.http.get<Array<Array<Figure>>>("http://localhost:8080/tableFigures",{withCredentials: true});
-    /*
-    const data: Array<Array<Figure>> =[[{color: new RKColor(3),instance:0, number:12}]]; 
-    return of(data);
-    */
   }
 
   public connectToGame(gameId: String): Observable<Response>
@@ -119,10 +115,6 @@ export class GameService {
   public submitMove(stateOld: GameState): Observable<GameState>
   {
     return this.http.post<GameState>("http://localhost:8080/submitMove",stateOld,{withCredentials: true});
-    /*stateOld.accepted = false;
-    this.p.active = false;
-    return of(stateOld);
-    */
   }
 
 }

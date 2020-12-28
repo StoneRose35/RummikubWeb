@@ -25,6 +25,16 @@ export class JokerProcessor {
             }
         }
     }
+
+    public reset(line: Array<Figure>)
+    {
+        let jokers = line.filter(f => f.instance > 2);
+        jokers.forEach(f => {
+            f.number=0;
+            f.color=null;
+        });
+
+    }
     
     private completeSeries(line: Array<Figure>)
     {

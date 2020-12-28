@@ -11,6 +11,7 @@ export class FigureComponent implements OnInit {
 
   @Input()
   figure: Figure;
+  clr: String;
   repr: String;
 
   constructor() { }
@@ -31,6 +32,7 @@ export class FigureComponent implements OnInit {
         this.repr = "J";
       }
     }
+    this.clr = this.figure.color.rgb;
   }
 
 }

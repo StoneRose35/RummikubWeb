@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Figure } from './../figure';
 import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
+import { JokerProcessor } from './../joker-processor';
 
 @Component({
   selector: 'app-figure-serie',
@@ -22,7 +23,8 @@ export class FigureSerieComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  drop(event: CdkDragDrop<string[]>) {
+  drop(event: CdkDragDrop<Figure[]>) {
+    let jp = new JokerProcessor();
     if (event.previousContainer === event.container) {
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     } else {
@@ -30,6 +32,7 @@ export class FigureSerieComponent implements OnInit {
                         event.container.data,
                         event.previousIndex,
                         event.currentIndex);
+      jp.process(event.container.data);
     }
   }
 
