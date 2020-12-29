@@ -10,15 +10,17 @@ export class JokerProcessor {
 
     public process(line: Array<Figure>)
     {
+        
         if (line.filter(f => f.instance > 2).length>0)
         {
+            let lineWithoutJokers = line.filter(f => f.instance<3);
             let jokers = line.filter(f => f.instance > 2);
-            if(line.filter((val,idx,fline) => fline.findIndex(v => v.color.code === val.color.code)===idx).length===1)
+            if(lineWithoutJokers.filter((val,idx,fline) => fline.findIndex(v => v.color.code === val.color.code)===idx).length===1)
             {
                 // same color, must be a series
                 this.completeSeries(line);
             }
-            else if(line.filter((val,idx,fline) => fline.findIndex(v => v.number === val.number)===idx).length===1)
+            else if(lineWithoutJokers.filter((val,idx,fline) => fline.findIndex(v => v.number === val.number)===idx).length===1)
             {
                 // same value, must be a collection
                 this.completeCollections(line);
@@ -45,8 +47,8 @@ export class JokerProcessor {
     {
         //check if missing number is in the middle
         let lineWithoutJokers = line.filter(f => f.instance<3);
-        let lowestnr = lineWithoutJokers.sort(f => f.number)[0].number;
-        let highestnr = lineWithoutJokers.sort(f => -f.number)[0].number;
+        let lowestnr = lineWithoutJokers.sort((a,b) => a.number-b.number)[0].number;
+        let highestnr = lineWithoutJokers.sort((a,b) => b.number-a.number)[0].number;
         let diff = (line.length-lineWithoutJokers.length)*(highestnr-lowestnr)/2.0 - line.map(f => f.number).reduce((a,b ) => a+b);
         if (diff > 0)
         {
