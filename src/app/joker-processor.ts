@@ -1,6 +1,11 @@
+import { Injectable } from '@angular/core';
 import { Figure } from './figure';
 import { RKColor } from './rkcolor';
 
+
+@Injectable({
+    providedIn: 'root'
+  })
 export class JokerProcessor {
 
     public process(line: Array<Figure>)

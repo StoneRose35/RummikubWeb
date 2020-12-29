@@ -7,15 +7,22 @@
     
 <div cdkDropListGroup [ngClass]="{'rk-inactive': playing === false}">
   <h2>Table</h2>
-    <app-figure-serie *ngFor="let item of tableFigures" [figures]="item" [disabled]="!playing"></app-figure-serie>
+    <div class="rk-table">
+      <app-figure-serie 
+        *ngFor="let item of tableFigures" 
+        [figures]="item" 
+        [disabled]="!playing" 
+        [ngClass]="{'rk-inactive': playing === false}"
+        ></app-figure-serie>
+    </div>
     <div class="rk-figure"
       cdkDropList
       [cdkDropListDisabled]="!playing"
       cdkDropListOrientation="horizontal"
-      (cdkDropListDropped)="dropNewSeries($event)"
-    >
+      (cdkDropListDropped)="dropNewSeries($event)">
       <h3 class="rk-figure-number">+</h3>
     </div>
+
 
   
   <h2>Stack</h2>
@@ -25,7 +32,7 @@
       cdkDropListOrientation="horizontal"
       [cdkDropListData]="stackFigures"
       [cdkDropListDisabled]="!playing"
-      class="rk-series"
+      class="rk-stack"
       [ngClass]="{'rk-inactive': playing === false}"
       (cdkDropListDropped)="drop($event)">
       <app-figure *ngFor="let item of stackFigures" cdkDrag [figure]="item"></app-figure>

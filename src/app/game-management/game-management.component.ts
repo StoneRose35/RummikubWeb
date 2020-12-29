@@ -2,9 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import {MatSnackBar,MatSnackBarConfig} from '@angular/material/snack-bar';
 import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
 import {Figure} from './../figure';
-import {RKColor} from '../rkcolor';
-import {MatDialog} from '@angular/material/dialog';
-import { NewPlayerDialogComponent } from '../new-player-dialog/new-player-dialog.component';
 import { GameService, Player } from './../game.service';
 import { JokerProcessor } from './../joker-processor'
 
@@ -31,8 +28,8 @@ export class GameManagementComponent implements OnInit {
 
   constructor(private snackBar: MatSnackBar
               ,private sbConfig: MatSnackBarConfig
-              ,private dialog: MatDialog
               ,public gs: GameService
+              ,public jp: JokerProcessor
               ) { 
     this.sbConfig.duration=2000;
     this.stackFigures = [];
@@ -135,7 +132,6 @@ export class GameManagementComponent implements OnInit {
   }
 
   drop(event: CdkDragDrop<Figure[]>) {
-    let jp = new JokerProcessor();
     if (event.previousContainer === event.container) {
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     } else {
@@ -143,7 +139,7 @@ export class GameManagementComponent implements OnInit {
                         event.container.data,
                         event.previousIndex,
                         event.currentIndex);
-      jp.reset(event.container.data);
+      this.jp.reset(event.container.data);
     }
   }
 

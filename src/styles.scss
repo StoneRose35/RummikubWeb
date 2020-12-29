@@ -95,41 +95,6 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   margin: 15px;
 }
 
-.rk-figure {
-  width: 50px;
-  height: 80px;
-  border-radius: 10px;
-  border: solid;
-  border-color: black;
-  margin: 2px;
-  color: rgba(0, 0, 0, 0.87);
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  box-sizing: border-box;
-  cursor: move;
-  background-color: rgb(233, 233, 233);
-}
-
-.rk-series {
-  width: 1000px;
-  max-width: 100%;
-  border: solid 1px #ccc;
-  min-height: 60px;
-  display: flex;
-  flex-direction: row;
-  background: white;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-h3.rk-figure-number {
-  padding-top: 17px;
-  width: 20%;
-  margin: auto;
-  font-size: 17px;
-}
 
 .rk-inactive {
   background-color: rgb(192, 192, 192);

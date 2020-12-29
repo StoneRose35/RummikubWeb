@@ -16,7 +16,9 @@ export class FigureSerieComponent implements OnInit {
   @Input()
   disabled: Boolean;
 
-  constructor() { 
+  constructor(
+    public jp: JokerProcessor
+  ) { 
     this.figures=[];
   }
 
@@ -24,7 +26,6 @@ export class FigureSerieComponent implements OnInit {
   }
 
   drop(event: CdkDragDrop<Figure[]>) {
-    let jp = new JokerProcessor();
     if (event.previousContainer === event.container) {
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     } else {
@@ -32,7 +33,7 @@ export class FigureSerieComponent implements OnInit {
                         event.container.data,
                         event.previousIndex,
                         event.currentIndex);
-      jp.process(event.container.data);
+      this.jp.process(event.container.data);
     }
   }
 
