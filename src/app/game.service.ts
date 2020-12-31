@@ -1,10 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, timer, Subject } from 'rxjs';
-import {map,switchMap,takeUntil} from 'rxjs/operators';
-import {Figure} from './figure';
-import { RKColor } from './rkcolor';
-import { HttpClient,HttpParams } from '@angular/common/http';
-import { CookieService } from 'ngx-cookie-service';  
+import { switchMap } from 'rxjs/operators';
+import { Figure } from './figure';
+import { HttpClient } from '@angular/common/http';
 
 
 export interface Game {
@@ -29,6 +27,7 @@ export interface GameState {
 export interface Player {
   name: String;
   active: boolean;
+  finalScore: number;
 }
 
 export interface Response {
@@ -54,7 +53,7 @@ export class GameService {
 
   constructor(private http: HttpClient) { 
     this.activityChangedSubject=new Subject<boolean>();
-    this.p = {name: null, active: false};
+    this.p = {name: null, active: false, finalScore: null};
   }
 
   public getGames(): Observable<Array<GameOverview>>

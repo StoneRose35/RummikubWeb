@@ -15,13 +15,18 @@
         [ngClass]="{'rk-inactive': playing === false}"
         ></app-figure-serie>
     </div>
-    <div class="rk-figure"
+
+    <div
       cdkDropList
-      [cdkDropListDisabled]="!playing"
       cdkDropListOrientation="horizontal"
-      (cdkDropListDropped)="dropNewSeries($event)">
-      <h3 class="rk-figure-number">+</h3>
-    </div>
+      [cdkDropListDisabled]="!playing"
+      (cdkDropListDropped)="dropNewSeries($event)"
+      class="rk-series"
+      >
+      <div class="rk-figure">
+        <h3 class="rk-figure-number">+</h3>
+      </div>
+  </div>
 
 
   

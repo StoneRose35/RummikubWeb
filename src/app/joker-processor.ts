@@ -49,8 +49,8 @@ export class JokerProcessor {
         let lineWithoutJokers = line.filter(f => f.instance<3);
         let lowestnr = lineWithoutJokers.sort((a,b) => a.number-b.number)[0].number;
         let highestnr = lineWithoutJokers.sort((a,b) => b.number-a.number)[0].number;
-        let diff = (line.length-lineWithoutJokers.length)*(highestnr-lowestnr)/2.0 - line.map(f => f.number).reduce((a,b ) => a+b);
-        if (diff > 0)
+        let diff = (line.length)*(highestnr+lowestnr)/2.0 - lineWithoutJokers.map(f => f.number).reduce((a,b ) => a+b);
+        if (diff > 0 && Number.isInteger(diff) && lineWithoutJokers.filter(f => f.number===diff).length===0)
         {
             // number missing 
             let jokers = line.filter(f => f.instance > 2);
@@ -63,7 +63,7 @@ export class JokerProcessor {
                     if ((sorted[c+1].number-sorted[c].number) > 1)
                     {
                         jokers[jcntr].number = sorted[c].number + 1;
-                        jokers[jcntr].color = lineWithoutJokers[0].color
+                        jokers[jcntr].color = lineWithoutJokers[0].color;
                         jcntr++;
                     }
                 }
@@ -85,7 +85,7 @@ export class JokerProcessor {
         else {
             // line is complete, set all jokers to the right side
             let jcntr = 0;
-            let sorted = lineWithoutJokers.sort(f => f.number);
+            let sorted = lineWithoutJokers.sort((fa, fb) => fa.number-fb.number);
             let jokers = line.filter(f => f.instance > 2);
             for(let jc=0;jc<jokers.length;jc++)
             {
@@ -105,6 +105,7 @@ export class JokerProcessor {
         let mcCntr = 0;
         jokers.forEach(el => {
             el.color = missingColors[mcCntr];
+            el.number = lineWithoutJokers[0].number;
             mcCntr++;
         });
     }

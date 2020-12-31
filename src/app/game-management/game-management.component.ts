@@ -1,9 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewContainerRef } from '@angular/core';
 import {MatSnackBar,MatSnackBarConfig} from '@angular/material/snack-bar';
 import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
 import {Figure} from './../figure';
 import { GameService, Player } from './../game.service';
 import { JokerProcessor } from './../joker-processor'
+import { Router } from '@angular/router';
+import {Overlay, OverlayConfig, OverlayRef} from '@angular/cdk/overlay';
+import { ComponentPortal } from '@angular/cdk/portal';
+import { WinnerScreenComponent } from '../winner-screen/winner-screen.component';
 
 @Component({
   selector: 'app-game-management',
@@ -30,6 +34,9 @@ export class GameManagementComponent implements OnInit {
               ,private sbConfig: MatSnackBarConfig
               ,public gs: GameService
               ,public jp: JokerProcessor
+              ,private router: Router
+              ,private overlay: Overlay
+              ,public viewContainerRef: ViewContainerRef
               ) { 
     this.sbConfig.duration=2000;
     this.stackFigures = [];
@@ -57,6 +64,33 @@ export class GameManagementComponent implements OnInit {
       this.playerPollSubscription = this.gs.pollPlayers().subscribe(ps => {
         this.players=ps;
         this.gs.p.active = ps.filter(p => p.name === this.gs.p.name)[0].active;
+        this.gs.p.finalScore = ps.filter(p => p.name === this.gs.p.name)[0].finalScore;
+        if (this.gs.p.finalScore !== null)
+        {
+          let winner = this.players.filter(p => p.finalScore===0);
+          
+          let config = new OverlayConfig();
+
+          config.positionStrategy = this.overlay.position()
+              .global()
+              .centerHorizontally()
+              .centerVertically();
+      
+      
+          config.hasBackdrop = true;
+      
+          let overlayRef = this.overlay.create(config);
+      
+          overlayRef.backdropClick().subscribe(() => {
+            overlayRef.dispose();
+            this.router.navigateByUrl("/overview");
+          });
+        
+          let portal = new ComponentPortal(WinnerScreenComponent, this.viewContainerRef);
+          const componentRef = overlayRef.attach(portal);
+          componentRef.instance.players = ps.sort((p1,p2) => p2.finalScore - p1.finalScore);
+
+        }
         if (this.playing===true && this.gs.p.active===false)
         {
           // switch from active to inactive
@@ -84,7 +118,9 @@ export class GameManagementComponent implements OnInit {
   }
 
   submitMove() {
+    this.tableFigures = this.tableFigures.filter(f => f.length > 0);
     const gameState={tableFigures: this.tableFigures, shelfFigures: this.stackFigures, accepted: false, roundNr: 13 };
+
     this.gs.submitMove(gameState).subscribe(r => {
       if (r.accepted == false) // game state submitted is invalid
       {
@@ -105,11 +141,13 @@ export class GameManagementComponent implements OnInit {
     this.stackFiguresOld.forEach(f => {
       this.stackFigures.push(f);
     });
+    this.jp.reset(this.stackFigures);
     this.tableFiguresOld.forEach(tf => {
       this.tableFigures.push([]);
       tf.forEach(f => {
         this.tableFigures[this.tableFigures.length-1].push(f);
       });
+      this.jp.process(tf);
     });
 
   }

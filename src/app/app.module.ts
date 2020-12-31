@@ -17,6 +17,8 @@ import { MatInputModule } from '@angular/material/input';
 import { GamesOverviewComponent } from './games-overview/games-overview.component';
 import { RoutingModule } from './routing/routing.module';
 import { HttpClientModule } from '@angular/common/http';
+import { WinnerScreenComponent } from './winner-screen/winner-screen.component';
+import { OverlayModule } from '@angular/cdk/overlay';
 
 @NgModule({
   declarations: [
@@ -25,7 +27,8 @@ import { HttpClientModule } from '@angular/common/http';
     FigureComponent,
     FigureSerieComponent,
     NewPlayerDialogComponent,
-    GamesOverviewComponent
+    GamesOverviewComponent,
+    WinnerScreenComponent
   ],
   imports: [
     BrowserModule,
@@ -36,10 +39,11 @@ import { HttpClientModule } from '@angular/common/http';
     MatFormFieldModule,
     MatInputModule,
     RoutingModule,
-    HttpClientModule
+    HttpClientModule,
+    OverlayModule
   ],
   providers: [MatSnackBar, Overlay, MatSnackBarConfig],
   bootstrap: [AppComponent],
-  entryComponents: [NewPlayerDialogComponent]
+  entryComponents: [NewPlayerDialogComponent, WinnerScreenComponent]
 })
 export class AppModule { }
