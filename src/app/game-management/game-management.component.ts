@@ -127,11 +127,8 @@ export class GameManagementComponent implements OnInit {
         this.snackBar.open("Invalid Move, resetting",null,this.sbConfig);
         this.resetMove();
       }
-      else 
-      {
-        this.stackFigures = r.shelfFigures;
-        this.tableFigures = r.tableFigures;
-      }
+      this.stackFigures = r.shelfFigures;
+      this.tableFigures = r.tableFigures;
     });
   }
 

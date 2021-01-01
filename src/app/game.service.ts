@@ -3,6 +3,7 @@ import { Observable, of, timer, Subject } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { Figure } from './figure';
 import { HttpClient } from '@angular/common/http';
+import { backendPort, environment } from './../environments/environment';
 
 
 export interface Game {
@@ -50,15 +51,17 @@ export class GameService {
   gameId: String;
   activityChangedSubject: Subject<boolean>;
   roundNr: number;
+  url: String;
 
   constructor(private http: HttpClient) { 
     this.activityChangedSubject=new Subject<boolean>();
     this.p = {name: null, active: false, finalScore: null};
+    this.url = window.location.protocol + "//" + window.location.hostname + ":" + backendPort;
   }
 
   public getGames(): Observable<Array<GameOverview>>
   {
-      return this.http.get<Array<GameOverview>>("http://localhost:8080/games");
+      return this.http.get<Array<GameOverview>>(this.url + "/games");
   }
 
 
@@ -70,24 +73,24 @@ export class GameService {
 
   public registerPlayer(playerName: String, gameName: String): Observable<ResponsePlayer>
   {
-    return this.http.get<ResponsePlayer>("http://localhost:8080/registerPlayer",{params: {name: playerName.toString(),gameId: gameName.toString() },withCredentials: true})
+    return this.http.get<ResponsePlayer>(this.url + "/registerPlayer",{params: {name: playerName.toString(),gameId: gameName.toString() },withCredentials: true})
   }
 
   public shelfFigures(): Observable<Array<Figure>>
   {
-    return this.http.get<Array<Figure>>("http://localhost:8080/shelfFigures",{withCredentials: true});
+    return this.http.get<Array<Figure>>(this.url + "/shelfFigures",{withCredentials: true});
   }
 
   public initGame(gameName: String): Observable<Response> 
   {
     this.gameId = gameName;
-    return this.http.get<Response>("http://localhost:8080/newgame",{params: {name: gameName.toString()}});
+    return this.http.get<Response>(this.url + "/newgame",{params: {name: gameName.toString()}});
   }
 
   public pollPlayers(): Observable<Array<Player>> 
   {
     const act_old = this.p.active;
-    return timer(1,500).pipe(switchMap(() => this.http.get<Array<Player>>("http://localhost:8080/players",{withCredentials: true})));
+    return timer(1,500).pipe(switchMap(() => this.http.get<Array<Player>>(this.url + "/players",{withCredentials: true})));
   }
 
   activityChanged(): Observable<boolean> {
@@ -96,24 +99,17 @@ export class GameService {
 
   pollTable(): Observable<Array<Array<Figure>>>
   {  
-    return this.http.get<Array<Array<Figure>>>("http://localhost:8080/tableFigures",{withCredentials: true});
-  }
-
-  public connectToGame(gameId: String): Observable<Response>
-  {
-    this.gameId=gameId;
-    const resp={message: "Successfully attached game", error: null};
-    return of(resp);
+    return this.http.get<Array<Array<Figure>>>(this.url + "/tableFigures",{withCredentials: true});
   }
 
   public drawFigure(): Observable<Figure>
   {
-    return this.http.get<Figure>("http://localhost:8080/draw",{withCredentials: true});
+    return this.http.get<Figure>(this.url + "/draw",{withCredentials: true});
   }
 
   public submitMove(stateOld: GameState): Observable<GameState>
   {
-    return this.http.post<GameState>("http://localhost:8080/submitMove",stateOld,{withCredentials: true});
+    return this.http.post<GameState>(this.url + "/submitMove",stateOld,{withCredentials: true});
   }
 
 }
