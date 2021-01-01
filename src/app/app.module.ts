@@ -19,6 +19,8 @@ import { RoutingModule } from './routing/routing.module';
 import { HttpClientModule } from '@angular/common/http';
 import { WinnerScreenComponent } from './winner-screen/winner-screen.component';
 import { OverlayModule } from '@angular/cdk/overlay';
+import {MatSelectModule} from '@angular/material/select';
+import {MatButtonModule} from '@angular/material/button';
 
 @NgModule({
   declarations: [
@@ -40,7 +42,9 @@ import { OverlayModule } from '@angular/cdk/overlay';
     MatInputModule,
     RoutingModule,
     HttpClientModule,
-    OverlayModule
+    OverlayModule,
+    MatSelectModule,
+    MatButtonModule
   ],
   providers: [MatSnackBar, Overlay, MatSnackBarConfig],
   bootstrap: [AppComponent],

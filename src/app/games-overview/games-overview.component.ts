@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { GameService, GameOverview } from './../game.service';
 import { NewPlayerDialogComponent } from './../new-player-dialog/new-player-dialog.component';
 import { MatSnackBar,MatSnackBarConfig } from '@angular/material/snack-bar';
@@ -10,9 +10,12 @@ import { Router } from '@angular/router';
   templateUrl: './games-overview.component.html',
   styleUrls: ['./games-overview.component.scss']
 })
-export class GamesOverviewComponent implements OnInit {
+export class GamesOverviewComponent implements OnInit, OnDestroy {
 
   games: Array<GameOverview>;
+  aiPlayers;
+  gameName: String;
+  pollGamesSubscription;
 
   constructor(private snackBar: MatSnackBar,
               private sbConfig: MatSnackBarConfig,
@@ -20,18 +23,30 @@ export class GamesOverviewComponent implements OnInit {
               private dialog: MatDialog,
               private router: Router){ }
 
+  ngOnDestroy(): void {
+    if (this.pollGamesSubscription !== null)
+    {
+      this.pollGamesSubscription.unsubscribe();
+      this.pollGamesSubscription=null;
+    }
+  }
+
   ngOnInit(): void {
-    this.updateGameList();
+    if (this.pollGamesSubscription == null)
+    {
+      this.pollGamesSubscription = this.gs.pollGames().subscribe(games => this.games=games);
+    }
   }
 
-  updateGameList()
-  {
-    this.gs.getGames().subscribe(games => this.games = games);
-  }
 
-  registerGame(name: String)
+  registerGame()
   {
-    this.gs.initGame(name).subscribe(() => this.updateGameList());
+    this.gs.initGame(this.gameName,this.aiPlayers).subscribe(r => {
+      if (r.error !== null)
+      {
+        this.snackBar.open(`game initialization failed: ${r.error}`,null,this.sbConfig);
+      }
+    });
   }
 
   joinGame(gameName: String)

@@ -1,11 +1,11 @@
-import { Component, OnInit, ViewContainerRef } from '@angular/core';
+import { Component, OnInit, ViewContainerRef, OnDestroy } from '@angular/core';
 import {MatSnackBar,MatSnackBarConfig} from '@angular/material/snack-bar';
 import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
 import {Figure} from './../figure';
 import { GameService, Player } from './../game.service';
 import { JokerProcessor } from './../joker-processor'
 import { Router } from '@angular/router';
-import {Overlay, OverlayConfig, OverlayRef} from '@angular/cdk/overlay';
+import {Overlay, OverlayConfig } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { WinnerScreenComponent } from '../winner-screen/winner-screen.component';
 
@@ -14,7 +14,7 @@ import { WinnerScreenComponent } from '../winner-screen/winner-screen.component'
   templateUrl: './game-management.component.html',
   styleUrls: ['./game-management.component.scss']
 })
-export class GameManagementComponent implements OnInit {
+export class GameManagementComponent implements OnInit, OnDestroy {
 
   tableFigures: Array<Array<Figure>>;
   stackFigures: Array<Figure>;
@@ -28,6 +28,8 @@ export class GameManagementComponent implements OnInit {
   playerPollSubscription: any;
   tablePollSubscription: any;
   activityChangeSubscription: any;
+  cannotDraw: boolean;
+  cannotSubmit: boolean;
  
 
   constructor(private snackBar: MatSnackBar
@@ -52,13 +54,14 @@ export class GameManagementComponent implements OnInit {
     this.message=`Running Game ${this.gs.gameId}`;
     this.stackFigures = [];
     this.tableFigures=[];
-    this.gs.pollTable().subscribe(t => {
+    this.gs.getTable().subscribe(t => {
       this.tableFigures=t;
-      this.gs.shelfFigures().subscribe(f => {
-        this.stackFigures=f;
-        this.onTurn();
-      });
     });
+    this.gs.shelfFigures().subscribe(f => {
+      this.stackFigures=f;
+      this.onTurn();
+    });
+    this.cannotSubmit
     if (this.playerPollSubscription == null)
     {
       this.playerPollSubscription = this.gs.pollPlayers().subscribe(ps => {
@@ -67,29 +70,7 @@ export class GameManagementComponent implements OnInit {
         this.gs.p.finalScore = ps.filter(p => p.name === this.gs.p.name)[0].finalScore;
         if (this.gs.p.finalScore !== null)
         {
-          let winner = this.players.filter(p => p.finalScore===0);
-          
-          let config = new OverlayConfig();
-
-          config.positionStrategy = this.overlay.position()
-              .global()
-              .centerHorizontally()
-              .centerVertically();
-      
-      
-          config.hasBackdrop = true;
-      
-          let overlayRef = this.overlay.create(config);
-      
-          overlayRef.backdropClick().subscribe(() => {
-            overlayRef.dispose();
-            this.router.navigateByUrl("/overview");
-          });
-        
-          let portal = new ComponentPortal(WinnerScreenComponent, this.viewContainerRef);
-          const componentRef = overlayRef.attach(portal);
-          componentRef.instance.players = ps.sort((p1,p2) => p2.finalScore - p1.finalScore);
-
+          this.showWinnerScreen();
         }
         if (this.playing===true && this.gs.p.active===false)
         {
@@ -99,7 +80,7 @@ export class GameManagementComponent implements OnInit {
         else if (this.playing===false && this.gs.p.active===true)
         {
           // switch from passive to active
-          this.gs.pollTable().subscribe(t => {
+          this.gs.getTable().subscribe(t => {
             this.tableFigures=t; 
             this.onTurn();
             this.playing=this.gs.p.active;
@@ -111,6 +92,43 @@ export class GameManagementComponent implements OnInit {
         }
       });
     }
+  }
+
+  ngOnDestroy()
+  {
+    if (this.playerPollSubscription !== null) 
+    {
+      this.playerPollSubscription.unsubscribe();
+      this.playerPollSubscription=null;
+    }
+  }
+
+  showWinnerScreen()
+  {
+    this.playerPollSubscription.unsubscribe();
+    this.playerPollSubscription=null;
+    let winner = this.players.filter(p => p.finalScore===0);
+    
+    let config = new OverlayConfig();
+
+    config.positionStrategy = this.overlay.position()
+        .global()
+        .centerHorizontally()
+        .centerVertically();
+
+
+    config.hasBackdrop = true;
+
+    let overlayRef = this.overlay.create(config);
+
+    overlayRef.backdropClick().subscribe(() => {
+      overlayRef.dispose();
+      this.router.navigateByUrl("/overview");
+    });
+  
+    let portal = new ComponentPortal(WinnerScreenComponent, this.viewContainerRef);
+    const componentRef = overlayRef.attach(portal);
+    componentRef.instance.players = this.players.sort((p1,p2) => p1.finalScore - p2.finalScore);
   }
 
   drawFigure() {
@@ -163,6 +181,8 @@ export class GameManagementComponent implements OnInit {
         this.tableFiguresOld[this.tableFiguresOld.length-1].push(f);
       });
     });
+    this.cannotDraw=false;
+    this.cannotSubmit=true;
 
   }
 
@@ -184,6 +204,12 @@ export class GameManagementComponent implements OnInit {
                       this.tableFigures[this.tableFigures.length-1],
                       event.previousIndex,
                       0);
+    this.enableSubmit();
   }
 
+  enableSubmit()
+  {
+    this.cannotDraw=true;
+    this.cannotSubmit=false;
+  }
 }

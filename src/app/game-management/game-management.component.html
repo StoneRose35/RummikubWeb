@@ -1,9 +1,13 @@
-<div class="rk-container"><div class="rk-top-element">{{gs.gameId}}, round {{gs.roundNr}}</div></div>
+<div class="rk-container"><div class="rk-current-player">{{gs.p.name}}</div></div>
 
 
 <h2>Players</h2>
 <div class="rk-container"><div *ngFor="let p of players" class="rk-player" [ngClass]="{'rk-player-active': p.active === true}">{{p.name}} </div></div>
-<div [hidden]="!playing" class="rk-container"><button class="rk-top-element" (click)="drawFigure()">Draw Figure</button><button class="rk-top-element" (click)="submitMove()">Submit Move</button><button class="rk-top-element" (click)="resetMove()" >Reset Move</button></div>
+<div [hidden]="!playing" class="rk-container">
+    <button mat-raised-button class="rk-top-element" (click)="drawFigure()" [disabled]="cannotDraw">Draw Figure</button>
+    <button mat-raised-button class="rk-top-element" (click)="submitMove()" [disabled]="cannotSubmit">Submit Move</button>
+    <button mat-raised-button class="rk-top-element" (click)="resetMove()" >Reset Move</button>
+</div>
     
 <div cdkDropListGroup [ngClass]="{'rk-inactive': playing === false}">
   <h2>Table</h2>
@@ -13,6 +17,7 @@
         [figures]="item" 
         [disabled]="!playing" 
         [ngClass]="{'rk-inactive': playing === false}"
+        (figuredropped)="enableSubmit()"
         ></app-figure-serie>
     </div>
 
@@ -47,4 +52,4 @@
   
 
 
-<div class="bottomStatusBar">{{message}}</div>
+<div class="bottomStatusBar">Running game {{this.gs.gameId}}</div>

@@ -6,7 +6,8 @@ import { GamesOverviewComponent } from './../games-overview/games-overview.compo
 
 const routes: Routes = [
   { path: 'overview', component: GamesOverviewComponent },
-  { path: 'game-management', component: GameManagementComponent }
+  { path: 'game-management', component: GameManagementComponent },
+  { path: '',   redirectTo: '/overview', pathMatch: 'full' }
 ];
 
 @NgModule({

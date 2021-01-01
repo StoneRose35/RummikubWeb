@@ -64,6 +64,10 @@ export class GameService {
       return this.http.get<Array<GameOverview>>(this.url + "/games");
   }
 
+  public pollGames(): Observable<Array<GameOverview>>
+  {
+    return timer(1,500).pipe(switchMap(() => this.http.get<Array<GameOverview>>(this.url + "/games")));
+  }
 
   public startGame(gameId: String): Observable<Game>
   {
@@ -81,10 +85,10 @@ export class GameService {
     return this.http.get<Array<Figure>>(this.url + "/shelfFigures",{withCredentials: true});
   }
 
-  public initGame(gameName: String): Observable<Response> 
+  public initGame(gameName: String,nrAiPlayers: number): Observable<Response> 
   {
     this.gameId = gameName;
-    return this.http.get<Response>(this.url + "/newgame",{params: {name: gameName.toString()}});
+    return this.http.get<Response>(this.url + "/newgame",{params: {name: gameName.toString(),nrAiPlayers: nrAiPlayers.toString()}});
   }
 
   public pollPlayers(): Observable<Array<Player>> 
@@ -97,7 +101,7 @@ export class GameService {
     return this.activityChangedSubject;
   }
 
-  pollTable(): Observable<Array<Array<Figure>>>
+  getTable(): Observable<Array<Array<Figure>>>
   {  
     return this.http.get<Array<Array<Figure>>>(this.url + "/tableFigures",{withCredentials: true});
   }

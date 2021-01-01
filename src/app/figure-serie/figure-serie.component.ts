@@ -1,7 +1,8 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, EventEmitter, Output } from '@angular/core';
 import { Figure } from './../figure';
 import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
 import { JokerProcessor } from './../joker-processor';
+import {  Subject } from 'rxjs';
 
 @Component({
   selector: 'app-figure-serie',
@@ -15,6 +16,8 @@ export class FigureSerieComponent implements OnInit {
 
   @Input()
   disabled: Boolean;
+
+  @Output() figuredropped: EventEmitter<any> = new EventEmitter();
 
   constructor(
     public jp: JokerProcessor
@@ -34,6 +37,7 @@ export class FigureSerieComponent implements OnInit {
                         event.previousIndex,
                         event.currentIndex);
       this.jp.process(event.container.data);
+      this.figuredropped.emit();
     }
   }
 
