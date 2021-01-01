@@ -1,7 +1,10 @@
-<ul>
-    <li *ngFor="let g of games"><div >{{g.name}}</div>
-        <div><p *ngFor="let pl of g.players">{{pl}}</p></div>
-        <button (click)="joinGame(g.name)">Join</button>
+<ul class="rk-game">
+    <li *ngFor="let g of games" class="rk-game">
+        <div class="rk-game">
+            <div class="rk-game-title">{{g.name}}</div>
+            <div *ngFor="let pl of g.players" class="rk-game-players">{{pl}}</div>
+        </div>
+        <button (click)="joinGame(g.name)" class="rk-game">Join</button>
     </li>
 </ul>
 <input #newGameName (keyup.enter)="registerGame(newGameName.value)">
