@@ -16,6 +16,7 @@ export interface Game {
 export interface GameOverview {
   players: Array<String>;
   name: String;
+  state: String;
 }
 
 export interface GameState {
@@ -114,6 +115,11 @@ export class GameService {
   public submitMove(stateOld: GameState): Observable<GameState>
   {
     return this.http.post<GameState>(this.url + "/submitMove",stateOld,{withCredentials: true});
+  }
+
+  public dispose(): Observable<Response>
+  {
+    return this.http.get<Response>(this.url + "/dispose",{withCredentials: true});
   }
 
 }

@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
 import {Overlay, OverlayConfig } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { WinnerScreenComponent } from '../winner-screen/winner-screen.component';
+import { ThrowStmt } from '@angular/compiler';
 
 @Component({
   selector: 'app-game-management',
@@ -107,7 +108,6 @@ export class GameManagementComponent implements OnInit, OnDestroy {
   {
     this.playerPollSubscription.unsubscribe();
     this.playerPollSubscription=null;
-    let winner = this.players.filter(p => p.finalScore===0);
     
     let config = new OverlayConfig();
 
@@ -122,6 +122,7 @@ export class GameManagementComponent implements OnInit, OnDestroy {
     let overlayRef = this.overlay.create(config);
 
     overlayRef.backdropClick().subscribe(() => {
+      this.gs.dispose().subscribe();
       overlayRef.dispose();
       this.router.navigateByUrl("/overview");
     });
